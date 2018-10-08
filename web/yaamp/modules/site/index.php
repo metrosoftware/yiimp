@@ -12,7 +12,6 @@ JavascriptFile('/yaamp/ui/js/auto_refresh.js');
 $height = '240px';
 
 $min_payout = floatval(YAAMP_PAYMENTS_MINI);
-$min_sunday = $min_payout/10;
 
 $payout_freq = (YAAMP_PAYMENTS_FREQ / 3600)." hours";
 ?>
@@ -33,12 +32,11 @@ $payout_freq = (YAAMP_PAYMENTS_FREQ / 3600)." hours";
 
 <ul>
 
+<li>Metrodex pool is based on YiiMP pool</li>
 <li>YiiMP is a pool management solution based on the Yii Framework.</li>
-<li>This fork was based on the yaamp source code and is now an open source project.</li>
-<li>No registration is required, we do payouts in the currency you mine. Use your wallet address as the username.</li>
+<li>No registration is required. Use your publickey as the username.</li>
 <li>&nbsp;</li>
-<li>Payouts are made automatically every <?= $payout_freq ?> for all balances above <b><?= $min_payout ?></b>, or <b><?= $min_sunday ?></b> on Sunday.</li>
-<li>For some coins, there is an initial delay before the first payout, please wait at least 6 hours before asking for support.</li>
+<li>Payouts are made automatically every <?= $payout_freq ?> for all balances above <b><?= $min_payout ?></b>.</li>
 <li>Blocks are distributed proportionally among valid submitted shares.</li>
 
 <br/>
@@ -57,16 +55,11 @@ $payout_freq = (YAAMP_PAYMENTS_FREQ / 3600)." hours";
 
 <li>
 <p class="main-left-box" style='padding: 3px; font-size: .8em; background-color: #ffffee; font-family: monospace;'>
-	-o stratum+tcp://<?= YAAMP_STRATUM_URL ?>:&lt;PORT&gt; -u &lt;WALLET_ADDRESS&gt; [-p &lt;OPTIONS&gt;]</p>
+	--algorithm metro -o stratum+tcp://<?= YAAMP_STRATUM_URL ?>:5135 -u &lt;PUBLIC_KEY&gt; [-p &lt;OPTIONS&gt;]</p>
 </li>
-
-<?php if (YAAMP_ALLOW_EXCHANGE): ?>
-<li>&lt;WALLET_ADDRESS&gt; can be one of any currency we mine or a BTC address.</li>
-<?php else: ?>
-<li>&lt;WALLET_ADDRESS&gt; should be valid for the currency you mine. <b>DO NOT USE a BTC address here, the auto exchange is disabled</b>!</li>
-<?php endif; ?>
-<li>As optional password, you can use <b>-p c=&lt;SYMBOL&gt;</b> if yiimp does not set the currency correctly on the Wallet page.</li>
-<li>See the "Pool Status" area on the right for PORT numbers. Algorithms without associated coins are disabled.</li>
+<li>To get your public key enter your password to log in to the wallet. Then click on your balance.</li>
+<img src="images/pubkey.jpg">
+<li>For now only sgminer allowed. Download it here: <a href="https://github.com/metrosoftware/sgminer/releases/tag/5.6.1-metro-pool">https://github.com/metrosoftware/sgminer/releases/tag/5.6.1-metro-pool</a>.</li>
 
 <br>
 
@@ -163,4 +156,3 @@ function pool_history_refresh()
 }
 
 </script>
-

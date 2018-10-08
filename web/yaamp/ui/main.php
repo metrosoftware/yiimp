@@ -83,7 +83,7 @@ function showPageHeader()
 	echo '<div class="tabmenu-out">';
 	echo '<div class="tabmenu-inner">';
 
-	echo '&nbsp;&nbsp;<a href="/">'.YAAMP_SITE_NAME.'</a>';
+	echo '&nbsp;&nbsp;<a href="/" class="logo"><img src="/images/metro_logo_small.png"/></a>';
 
 	$action = controller()->action->id;
 	$wallet = user()->getState('yaamp-wallet');
@@ -129,7 +129,7 @@ function showPageHeader()
 	$eta = ($mining->last_payout+YAAMP_PAYMENTS_FREQ) - time();
 	$eta_mn = 'in '.round($eta / 60).' minutes';
 
-	echo '<span id="nextpayout" style="font-size: .8em;" title="'.$eta_mn.'">Next Payout: '.$nextpayment.'</span>';
+	echo '<span id="nextpayout" style="font-size: .8em; padding 8px;" title="'.$eta_mn.'">Next Payout: '.$nextpayment.'</span>';
 
 	echo "</div>";
 	echo "</div>";

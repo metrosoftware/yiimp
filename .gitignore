@@ -10,7 +10,6 @@ bin/blocknotify-dcr
 stratum/config/
 log/
 *.log
-web/images/*
 web/yaamp/runtime/*
 cookies/
 bin/blocknotif

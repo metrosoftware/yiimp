@@ -89,35 +89,48 @@ hr
 	right: 0px;
 	left: 0px;
 	z-index: 8;
-	height: 40px;
-	color: #aaa;
+	height: 45px;
+	color: #fff;
 
-	background-image: url(/images/base/top_header.png);
-	background-repeat: repeat-x;
-	
 	-webkit-box-shadow: 0 2px 3px rgba(0, 0, 0, .25);
 	box-shadow: 0 2px 3px rgba(0, 0, 0, .25);
+
+	background: #1B0034;
+	background: -moz-linear-gradient(top, #1B0034 0%, #524b98 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#1B0034), color-stop(100%,#524b98));
+	background: -webkit-linear-gradient(top, #1B0034 0%,#524b98 100%);
+	background: -o-linear-gradient(top, #1B0034 0%,#524b98 100%);
+	background: -ms-linear-gradient(top, #1B0034 0%,#524b98 100%);
+	background: linear-gradient(to bottom, #1B0034 0%,#524b98 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#1B0034', endColorstr='#524b98',GradientType=0 );
+}
+
+.page .tabmenu-inner a.logo img {
+	width: 70px;
+	position: relative;
+	top: 4px;
+	padding: 0 20px
 }
 
 .page .tabmenu-inner
 {
 	font-size: 1.1em;
 	font-weight: bold;
-	padding: 10px;
+	padding: 5px;
 }
 
 .page .tabmenu-inner a
 {
 	text-decoration: none;
-	padding: 10px;
-	color: #aaa;
+	padding: 5px 10px;
+	color: #fff;
 }
 
 .page .tabmenu-inner .selected
 {
-	color: #eee;
+	color: #fff;
 	border: 1px solid #181818;
-	background-image: url(/images/base/top_header_selected.png);
+	background-color: #524B98;
 	background-repeat: repeat-x;
 }
 
