@@ -550,5 +550,32 @@ void coinbase_create(YAAMP_COIND *coind, YAAMP_JOB_TEMPLATE *templ, json_value *
 //	debuglog("coinb2 %s\n", templ->coinb2);
 }
 
+void metro_coinbase_create(YAAMP_COIND *coind, YAAMP_JOB_TEMPLATE *templ, json_value *json_result)
+{
+	char binpubkey[32];
+    char fullid[64];
+    binlify((unsigned char*)binpubkey, coind->script_pubkey);
+    sha256_hash_hex(binpubkey, fullid, 32);
+    fullid[24] ='\0';
+
+    char value_be[17];
+    long_be((uint64_t)templ->value, value_be);
+    value_be[16] ='\0';
+
+    //"0410" type, version, subtype
+    //"0100" deadline
+    //"0000000000000000" amount
+    //"0000000000000000" fee
+    //"0000000000000000000000000000000000000000000000000000000000000000" ref
+    //"00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000" sig
+    //"00000000" flags
+    //"01" appendix version
+    //"01" recepient size
+    sprintf(templ->coinb1,"0410%s0100%s%s000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000%s00000000%s%s0101%s%s",
+            templ->ntime, coind->script_pubkey, fullid, "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            templ->ecblockheight, templ->ecblockid, fullid, value_be);
+    //templ->coinb1[412] ='\0';
+    templ->coinb2[0] ='\0';
+}
 
 

@@ -298,9 +298,19 @@ YAAMP_JOB_TEMPLATE *coind_create_template(YAAMP_COIND *coind)
 	templ->created = time(NULL);
 	templ->value = json_get_int(json_result, "coinbasevalue");
 	templ->height = json_get_int(json_result, "height");
-	sprintf(templ->version, "%08x", (unsigned int)json_get_int(json_result, "version"));
-	sprintf(templ->ntime, "%08x", (unsigned int)json_get_int(json_result, "curtime"));
+	if (strcmp(coind->symbol, "METRO") == 0) {
+        short_be((uint16_t)json_get_int(json_result, "version"), templ->version);
 
+        uint64_t curtime = (uint64_t)json_get_int(json_result, "curtime");
+        long_be((uint64_t)json_get_int(json_result, "curtime"), templ->ntime);
+        int_be((uint32_t)json_get_int(json_result, "ecblockheight"), templ->ecblockheight);
+        long_be((uint64_t)json_get_int(json_result, "ecblockid"), templ->ecblockid);
+        const char *extradata = json_get_string(json_result, "extradata");
+        strcpy(templ->extradata_be, extradata ? extradata : "");
+	} else {
+        sprintf(templ->version, "%08x", (unsigned int)json_get_int(json_result, "version"));
+        sprintf(templ->ntime, "%08x", (unsigned int)json_get_int(json_result, "curtime"));
+	}
 	const char *bits = json_get_string(json_result, "bits");
 	strcpy(templ->nbits, bits ? bits : "");
 	const char *prev = json_get_string(json_result, "previousblockhash");
@@ -487,15 +497,19 @@ YAAMP_JOB_TEMPLATE *coind_create_template(YAAMP_COIND *coind)
 		templ->txmerkles[strlen(templ->txmerkles)-1] = 0;
 
 //	debuglog("merkle transactions %d [%s]\n", templ->txcount, templ->txmerkles);
-	ser_string_be2(templ->prevhash_hex, templ->prevhash_be, 8);
-
+	if(!strcmp(coind->symbol, "METRO"))
+        string_be(templ->prevhash_hex, templ->prevhash_be);
+    else
+        ser_string_be2(templ->prevhash_hex, templ->prevhash_be, 8);
 	if(!strcmp(coind->symbol, "LBC"))
 		ser_string_be2(templ->claim_hex, templ->claim_be, 8);
 
 	if(!coind->pos)
 		coind_aux_build_auxs(templ);
-
-	coinbase_create(coind, templ, json_result);
+	if(!strcmp(coind->symbol, "METRO"))
+        metro_coinbase_create(coind, templ, json_result);
+    else
+        coinbase_create(coind, templ, json_result);
 	json_value_free(json);
 
 	return templ;

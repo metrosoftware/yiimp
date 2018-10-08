@@ -62,6 +62,7 @@ screen -dmS decred $STRATUM_DIR/run.sh decred # blake 14
 
 #screen -dmS keccak $STRATUM_DIR/run.sh keccak
 #screen -dmS keccakc $STRATUM_DIR/run.sh keccakc
+#screen -dmS keccakmtr $STRATUM_DIR/run.sh keccakmtr
 #screen -dmS phi $STRATUM_DIR/run.sh phi
 #screen -dmS polytimos $STRATUM_DIR/run.sh polytimos
 screen -dmS whirlpool $STRATUM_DIR/run.sh whirlpool

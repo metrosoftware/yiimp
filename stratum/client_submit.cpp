@@ -39,6 +39,15 @@ void build_submit_values(YAAMP_JOB_VALUES *submitvalues, YAAMP_JOB_TEMPLATE *tem
 		sprintf(submitvalues->header, "%s%s%s%s%s%s%s", templ->version, templ->prevhash_be, submitvalues->merkleroot_be,
 			ntime, templ->nbits, nonce, templ->extradata_be);
 		ser_string_be(submitvalues->header, submitvalues->header_be, 36); // 80+64 / sizeof(u32)
+	} else 	if (!strcmp(g_stratum_algo, "keccakmtr")) {
+        memcpy(submitvalues->merkleroot_be, merkleroot.c_str(), 64);
+        char* nbits_be = new char[32];
+        string_be(templ->nbits, nbits_be);
+        nbits_be[8] ='\0';
+		sprintf(submitvalues->header, "%s%s%s%s%s%s%s", templ->version, templ->prevhash_be, submitvalues->merkleroot_be,
+			templ->extradata_be, ntime, nbits_be, nonce);
+        memcpy(submitvalues->header_be, submitvalues->header, 196);
+        delete nbits_be;
 	} else {
 		sprintf(submitvalues->header, "%s%s%s%s%s%s", templ->version, templ->prevhash_be, submitvalues->merkleroot_be,
 			ntime, templ->nbits, nonce);
@@ -349,6 +358,16 @@ static bool ntime_valid_range(const char ntimehex[])
 	return (abs(rawtime - ntime) < (30 * 60));
 }
 
+static bool metro_ntime_valid_range(const char ntimehex[])
+{
+	time_t rawtime = 0;
+	uint32_t ntime = 0;
+	if (strlen(ntimehex) != 16) return false;
+	sscanf(ntimehex, "%16x", &ntime);
+	time(&rawtime);
+	return (abs(rawtime - ntime) < (30 * 60 * 1000));
+}
+
 static bool valid_string_params(json_value *json_params)
 {
 	for(int p=0; p < json_params->u.array.length; p++) {
@@ -421,6 +440,7 @@ bool client_submit(YAAMP_CLIENT *client, json_value *json_params)
 	}
 
 	bool is_decred = job->coind && !strcmp("DCR", job->coind->rpcencoding);
+	bool is_metro = job->coind && !strcmp("METRO", job->coind->rpcencoding);
 
 	YAAMP_JOB_TEMPLATE *templ = job->templ;
 
@@ -431,10 +451,17 @@ bool client_submit(YAAMP_CLIENT *client, json_value *json_params)
 
 	if(strcmp(ntime, templ->ntime))
 	{
-		if (!ishexa(ntime, 8) || !ntime_valid_range(ntime)) {
-			client_submit_error(client, job, 23, "Invalid time rolling", extranonce2, ntime, nonce);
-			return true;
-		}
+        if (is_metro) {
+            if (!ishexa(ntime, 16) || !metro_ntime_valid_range(ntime) ) {
+                client_submit_error(client, job, 23, "Invalid time rolling", extranonce2, ntime, nonce);
+                return true;
+            }
+        } else {
+            if (!ishexa(ntime, 8) || !ntime_valid_range(ntime) ) {
+                client_submit_error(client, job, 23, "Invalid time rolling", extranonce2, ntime, nonce);
+                return true;
+            }
+        }
 		// dont allow algos permutations change over time (can lead to different speeds)
 		if (!g_allow_rolltime) {
 			client_submit_error(client, job, 23, "Invalid ntime (rolling not allowed)", extranonce2, ntime, nonce);

@@ -114,6 +114,9 @@ function BackendBlockFind1($coinid = NULL)
 
 		$block = $remote->getblock($db_block->blockhash);
 		$block_age = time() - $db_block->time;
+		if($coin->symbol == 'METRO') {
+		    $block_age = time() - 1530855419 - ($db_block->time / 1000);
+		}
 		if($coin->rpcencoding == 'DCR' && $block_age < 2000) {
 			// DCR generated blocks need some time to be accepted by the network (gettransaction)
 			if (!$block) continue;

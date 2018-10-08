@@ -85,6 +85,7 @@ void ser_string_be(const char *input, char *output, int len);
 void ser_string_be2(const char *input, char *output, int len);
 
 void string_be(const char *input, char *output);
+void odd_string_be(const char *input, char *output);
 void string_be1(char *s);
 
 bool ishexa(char *hex, int len);
@@ -137,3 +138,7 @@ static inline uint32_t bswap32(uint32_t x) {
 	__asm__ __volatile__ ("bswapl %0" : "=r" (x) : "0" (x));
 	return x;
 }
+
+void int_be(uint32_t input, char *output);
+void long_be(uint64_t input, char *output);
+void short_be(uint16_t input, char *output);

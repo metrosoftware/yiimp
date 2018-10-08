@@ -500,6 +500,19 @@ void string_be(const char *input, char *output)
 		memcpy(output + (len-i-1)*2, input + i*2, 2);
 }
 
+void odd_string_be(const char *input, char *output)
+{
+	int len = strlen(input);
+    if (len % 2 == 0) {
+		string_be(input, output);
+		return;
+    }
+    char buffer[len + 2];
+    buffer[0] = '0';
+    strcpy(buffer + 1, input);
+    string_be(buffer, output);
+}
+
 void string_be1(char *s)
 {
 	char s2[1024];
@@ -767,5 +780,36 @@ void sha256_hash_hex(const char *input, char *output, unsigned int len)
 
 	sha256_hash(input, output1, len);
 	hexlify(output, (unsigned char *)output1, 32);
+}
+
+void keccak256_hash_hex(const char *input, char *output, unsigned int len)
+{
+	char output1[32];
+
+	keccak256_hash(input, output1, len);
+	hexlify(output, (unsigned char *)output1, 32);
+}
+
+void int_be(uint32_t input, char *output)
+{
+    char buffer[8];
+    sprintf(buffer, "%08x", input);
+    odd_string_be(buffer, output);
+}
+
+void long_be(uint64_t input, char *output)
+{
+    char buffer[20];
+    sprintf(buffer, "%" PRIx64 "", input);
+    sprintf(output, "%08x", 0);
+    sprintf(output + 8, "%08x", 0);
+    odd_string_be(buffer, output);
+}
+
+void short_be(uint16_t input, char *output)
+{
+    char buffer[4];
+    sprintf(buffer, "%04x", input);
+    odd_string_be(buffer, output);
 }
 

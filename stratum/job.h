@@ -34,6 +34,9 @@ struct YAAMP_JOB_TEMPLATE
 	char claim_hex[128];
 	char claim_be[128];
 
+	char ecblockheight[16];
+	char ecblockid[32];
+
 	int txcount;
 	char txmerkles[YAAMP_SMALLBUFSIZE];
 
@@ -127,6 +130,7 @@ void job_init();
 
 
 void coinbase_create(YAAMP_COIND *coind, YAAMP_JOB_TEMPLATE *templ, json_value *json_result);
+void metro_coinbase_create(YAAMP_COIND *coind, YAAMP_JOB_TEMPLATE *templ, json_value *json_result);
 
 vector<string> coind_aux_hashlist(YAAMP_COIND_AUX **auxs, int size);
 vector<string> coind_aux_merkle_branch(YAAMP_COIND_AUX **auxs, int size, int index);
