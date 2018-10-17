@@ -1,5 +1,7 @@
-
+#include <mutex>
 #include "stratum.h"
+
+mutex _mutex;
 
 YAAMP_OBJECT *object_find(CommonList *list, int id, bool lock)
 {
@@ -25,20 +27,23 @@ YAAMP_OBJECT *object_find(CommonList *list, int id, bool lock)
 
 void object_lock(YAAMP_OBJECT *object)
 {
-	if(!object) return;
-	object->lock_count++;
+    unique_lock<mutex> lock(_mutex);
+	if(object) object->lock_count++;
+	lock.unlock();
 }
 
 void object_unlock(YAAMP_OBJECT *object)
 {
-	if(!object) return;
-	object->lock_count--;
+    unique_lock<mutex> lock(_mutex);
+	if(object) object->lock_count--;
+	lock.unlock();
 }
 
 void object_delete(YAAMP_OBJECT *object)
 {
-	if(!object) return;
-	object->deleted = true;
+    unique_lock<mutex> lock(_mutex);
+	if(object) object->deleted = true;
+	lock.unlock();
 }
 
 void object_prune(CommonList *list, YAAMP_OBJECT_DELETE_FUNC deletefunc)
@@ -50,17 +55,19 @@ void object_prune(CommonList *list, YAAMP_OBJECT_DELETE_FUNC deletefunc)
 		YAAMP_OBJECT *object = (YAAMP_OBJECT *)li->data;
 		li = li->next;
 
-		if(!object) continue;
+        unique_lock<mutex> lock(_mutex);
+		if(object) {
+            if(object->deleted && !object->lock_count)
+            {
+                deletefunc(object);
+                todel->data = NULL;
+                list->Delete(todel);
+            }
 
-		if(object->deleted && !object->lock_count)
-		{
-			deletefunc(object);
-			todel->data = NULL;
-			list->Delete(todel);
+            else if(object->lock_count && object->unlock)
+                object->lock_count--;
 		}
-
-		else if(object->lock_count && object->unlock)
-			object->lock_count--;
+        lock.unlock();
 	}
 
 	list->Leave();
@@ -75,20 +82,22 @@ void object_prune_debug(CommonList *list, YAAMP_OBJECT_DELETE_FUNC deletefunc)
 		YAAMP_OBJECT *object = (YAAMP_OBJECT *)li->data;
 		li = li->next;
 
-		if(!object) continue;
+        unique_lock<mutex> lock(_mutex);
+		if(object) {
+            if(object->deleted && object->lock_count)
+                debuglog("object set for delete is locked\n");
 
-		if(object->deleted && object->lock_count)
-			debuglog("object set for delete is locked\n");
+            if(object->deleted && !object->lock_count)
+            {
+                deletefunc(object);
+                todel->data = NULL;
+                list->Delete(todel);
+            }
 
-		if(object->deleted && !object->lock_count)
-		{
-			deletefunc(object);
-			todel->data = NULL;
-			list->Delete(todel);
+            else if(object->lock_count && object->unlock)
+                object->lock_count--;
 		}
-
-		else if(object->lock_count && object->unlock)
-			object->lock_count--;
+        lock.unlock();
 	}
 
 	if (list->count)

@@ -4,7 +4,7 @@
 
 # Compiler settings
 CC      ?= gcc
-CFLAGS	?= -g -O0
+CFLAGS	?= -g -std=c++11 -O0
 CFLAGS  += -fPIC -Wall -ansi -std=c99 -pedantic
 
 # Ar settings to build the library
